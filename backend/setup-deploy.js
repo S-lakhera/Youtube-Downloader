@@ -25,33 +25,39 @@ if (!isWin) {
 console.log('Successfully copied ffmpeg and ffprobe');
 
 // 2. Download OS-specific yt-dlp binary natively
-const ytDlpFileName = isWin ? 'yt-dlp.exe' : 'yt-dlp_linux';
-const ytDlpUrl = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytDlpFileName}`;
-const ytDlpPath = path.join(__dirname, ytDlpFileName);
-
-console.log(`Downloading ${ytDlpFileName} from ${ytDlpUrl}...`);
-
-const file = fs.createWriteStream(ytDlpPath);
-https.get(ytDlpUrl, (response) => {
-    if (response.statusCode === 301 || response.statusCode === 302) {
-        // Handle Github Redirects
-        https.get(response.headers.location, (res) => {
-            res.pipe(file);
+if (!isWin) {
+    const cp = require('child_process');
+    console.log('Linux Server Detected (Render). Using curl to reliably download standalone binary...');
+    // Render and generic Linux containers natively support curl, which flawlessly handles Github's redirect trees
+    cp.execSync('curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o yt-dlp_linux');
+    cp.execSync('chmod a+rx yt-dlp_linux');
+    console.log('yt-dlp_linux downloaded completely and is ready for production!');
+} else {
+    const ytDlpFileName = 'yt-dlp.exe';
+    const ytDlpUrl = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytDlpFileName}`;
+    const ytDlpPath = path.join(__dirname, ytDlpFileName);
+    
+    console.log(`Windows Machine Detected. Downloading ${ytDlpFileName} from ${ytDlpUrl}...`);
+    
+    const file = fs.createWriteStream(ytDlpPath);
+    https.get(ytDlpUrl, (response) => {
+        if (response.statusCode === 301 || response.statusCode === 302) {
+            https.get(response.headers.location, (res) => {
+                res.pipe(file);
+                file.on('finish', () => {
+                    file.close();
+                    console.log('yt-dlp.exe downloaded perfectly.');
+                });
+            });
+        } else {
+            response.pipe(file);
             file.on('finish', () => {
                 file.close();
-                if (!isWin) fs.chmodSync(ytDlpPath, 0o755);
-                console.log('yt-dlp downloaded completely and is ready for production!');
+                console.log('yt-dlp.exe downloaded perfectly.');
             });
-        });
-    } else {
-        response.pipe(file);
-        file.on('finish', () => {
-            file.close();
-            if (!isWin) fs.chmodSync(ytDlpPath, 0o755);
-            console.log('yt-dlp downloaded completely and is ready for production!');
-        });
-    }
-}).on('error', (err) => {
-    fs.unlink(ytDlpPath, () => {});
-    console.error('Download error:', err.message);
-});
+        }
+    }).on('error', (err) => {
+        fs.unlink(ytDlpPath, () => {});
+        console.error('Download error:', err.message);
+    });
+}

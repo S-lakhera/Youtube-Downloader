@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Download, Music, Video, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://youtube-downloader-alpha-two.vercel.app/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://youtube-downloader-backend-ahds.onrender.com/api';
 
 export default function FormatSelector({ videoUrl, availableQualities }) {
   const [downloadingFormat, setDownloadingFormat] = useState(null);
