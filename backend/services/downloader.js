@@ -8,7 +8,9 @@ const ffmpegPath = path.join(__dirname, '..', 'ffmpeg_bin');
 
 exports.getVideoInfo = (url) => {
   return new Promise((resolve, reject) => {
-    cp.execFile(ytdlpPath, ['-J', '--no-warnings', '--no-playlist', url], { maxBuffer: 1024 * 1024 * 30 }, (err, stdout) => {
+    // Add mobile client extractor arguments to bypass YouTube's aggressive Data Center IP blocks
+    const infoArgs = ['-J', '--no-warnings', '--no-playlist', '--extractor-args', 'youtube:player_client=ios', url];
+    cp.execFile(ytdlpPath, infoArgs, { maxBuffer: 1024 * 1024 * 30 }, (err, stdout) => {
         if (err) {
            console.error('yt-dlp info error:', err.message);
            return reject(new Error('Exec Error: ' + err.message));
@@ -51,7 +53,8 @@ exports.downloadVideo = async (url, format, res) => {
     let args = [
       '--ffmpeg-location', ffmpegPath,
       '--no-warnings',
-      '--no-playlist'
+      '--no-playlist',
+      '--extractor-args', 'youtube:player_client=ios'
     ];
 
     if (format === 'mp3') {
