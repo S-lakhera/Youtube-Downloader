@@ -4,7 +4,7 @@ import { Search, Loader2, Youtube, AlertCircle } from 'lucide-react';
 import VideoCard from './components/VideoCard';
 import FormatSelector from './components/FormatSelector';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://youtube-downloader-alpha-two.vercel.app/api';
 
 function App() {
   const [url, setUrl] = useState('');
