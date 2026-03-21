@@ -11,7 +11,7 @@ exports.getVideoInfo = (url) => {
     cp.execFile(ytdlpPath, ['-J', '--no-warnings', '--no-playlist', url], { maxBuffer: 1024 * 1024 * 30 }, (err, stdout) => {
         if (err) {
            console.error('yt-dlp info error:', err.message);
-           return reject(new Error('Failed to parse video info'));
+           return reject(new Error('Exec Error: ' + err.message));
         }
         try {
             const info = JSON.parse(stdout);
