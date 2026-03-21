@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const isWin = os.platform() === 'win32';
-const ytdlpPath = path.join(__dirname, '..', isWin ? 'yt-dlp.exe' : 'yt-dlp');
+const ytdlpPath = path.join(__dirname, '..', isWin ? 'yt-dlp.exe' : 'yt-dlp_linux');
 const ffmpegPath = path.join(__dirname, '..', 'ffmpeg_bin');
 
 exports.getVideoInfo = (url) => {

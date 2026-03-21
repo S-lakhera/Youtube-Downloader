@@ -25,11 +25,11 @@ if (!isWin) {
 console.log('Successfully copied ffmpeg and ffprobe');
 
 // 2. Download OS-specific yt-dlp binary natively
-const ytDlpName = isWin ? 'yt-dlp.exe' : 'yt-dlp';
-const ytDlpUrl = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytDlpName}`;
-const ytDlpPath = path.join(__dirname, ytDlpName);
+const ytDlpFileName = isWin ? 'yt-dlp.exe' : 'yt-dlp_linux';
+const ytDlpUrl = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/${ytDlpFileName}`;
+const ytDlpPath = path.join(__dirname, ytDlpFileName);
 
-console.log(`Downloading ${ytDlpName} from ${ytDlpUrl}...`);
+console.log(`Downloading ${ytDlpFileName} from ${ytDlpUrl}...`);
 
 const file = fs.createWriteStream(ytDlpPath);
 https.get(ytDlpUrl, (response) => {
