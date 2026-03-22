@@ -5,11 +5,14 @@ const os = require('os');
 const isWin = os.platform() === 'win32';
 const ytdlpPath = path.join(__dirname, '..', isWin ? 'yt-dlp.exe' : 'yt-dlp_linux');
 const ffmpegPath = path.join(__dirname, '..', 'ffmpeg_bin');
+const cachePath = path.join(__dirname, '..', 'yt-dlp-cache');
+const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER;
+const authArgs = isProd ? ['--oauth2', '--cache-dir', cachePath] : [];
 
 exports.getVideoInfo = (url) => {
   return new Promise((resolve, reject) => {
-    // Add mobile client extractor arguments to bypass YouTube's aggressive Data Center IP blocks
-    const infoArgs = ['-J', '--no-warnings', '--no-playlist', '--extractor-args', 'youtube:player_client=ios', url];
+    // yt-dlp version 2026.03.17 handles clients automatically.
+    const infoArgs = ['-J', ...authArgs, '--no-warnings', '--no-playlist', url];
     cp.execFile(ytdlpPath, infoArgs, { maxBuffer: 1024 * 1024 * 30 }, (err, stdout) => {
         if (err) {
            console.error('yt-dlp info error:', err.message);
@@ -52,9 +55,9 @@ exports.downloadVideo = async (url, format, res) => {
     
     let args = [
       '--ffmpeg-location', ffmpegPath,
+      ...authArgs,
       '--no-warnings',
-      '--no-playlist',
-      '--extractor-args', 'youtube:player_client=ios'
+      '--no-playlist'
     ];
 
     if (format === 'mp3') {
