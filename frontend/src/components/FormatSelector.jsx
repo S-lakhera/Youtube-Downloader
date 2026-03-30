@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Download, Music, Video, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://writing-pillow-immunology-duncan.trycloudflare.com/api';
 
@@ -10,6 +11,10 @@ export default function FormatSelector({ videoUrl, availableQualities }) {
     setDownloadingFormat(format);
     
     const downloadUrl = `${API_BASE_URL}/download?url=${encodeURIComponent(videoUrl)}&format=${format}`;
+    
+    toast.success('Download requested!', {
+      description: `Your ${format} download is being prepared...`
+    });
     
     const a = document.createElement('a');
     a.href = downloadUrl;

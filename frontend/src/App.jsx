@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Search, Loader2, Youtube, AlertCircle } from 'lucide-react';
 import VideoCard from './components/VideoCard';
 import FormatSelector from './components/FormatSelector';
+import { Toaster, toast } from 'sonner';
 
 const API_BASE_URL ='https://writing-pillow-immunology-duncan.trycloudflare.com/api';
 
@@ -20,13 +21,18 @@ function App() {
     setError('');
     setVideoInfo(null);
     
+    const toastId = toast.loading('Fetching video information...');
+    
     try {
       const response = await axios.get(`${API_BASE_URL}/info`, {
         params: { url }
       });
       setVideoInfo(response.data);
+      toast.success('Information fetched successfully!', { id: toastId });
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch video information. Please make sure the URL is valid.');
+      const errorMsg = err.response?.data?.error || 'Failed to fetch video information. Please make sure the URL is valid.';
+      setError(errorMsg);
+      toast.error(errorMsg, { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -34,6 +40,7 @@ function App() {
 
   return (
     <div className="min-h-screen text-textMain px-4 py-12 md:py-20 flex flex-col items-center">
+      <Toaster theme="dark" position="bottom-right" richColors />
       
       {/* Header */}
       <div className="text-center mb-12 animate-fade-in-down">
