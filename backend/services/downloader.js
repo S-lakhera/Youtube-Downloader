@@ -25,11 +25,19 @@ exports.getVideoInfo = (url) => {
             const availableQualities = new Set();
             if (info.formats) {
                 info.formats.forEach(f => {
+                   if (f.height === 2160) availableQualities.add('2160p');
+                   if (f.height === 1440) availableQualities.add('1440p');
                    if (f.height === 1080) availableQualities.add('1080p');
                    if (f.height === 720) availableQualities.add('720p');
                    if (f.height === 480) availableQualities.add('480p');
+                   if (f.height === 360) availableQualities.add('360p');
+                   if (f.height === 240) availableQualities.add('240p');
+                   if (f.height === 144) availableQualities.add('144p');
                 });
             }
+
+            let parsedQualities = Array.from(availableQualities);
+            parsedQualities.sort((a, b) => parseInt(b) - parseInt(a));
 
             resolve({
                 title: info.title,
@@ -37,7 +45,7 @@ exports.getVideoInfo = (url) => {
                 author: info.uploader,
                 lengthSeconds: info.duration,
                 views: info.view_count,
-                availableQualities: Array.from(availableQualities).length ? Array.from(availableQualities) : ['1080p', '720p', '480p'], 
+                availableQualities: parsedQualities.length ? parsedQualities : ['2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'], 
                 // We provide fallback since yt-dlp can implicitly downgrade/merge.
             });
         } catch (e) {
@@ -62,12 +70,26 @@ exports.downloadVideo = async (url, format, res) => {
 
     if (format === 'mp3') {
         args.push('-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === 'm4a') {
+        args.push('-x', '--audio-format', 'm4a', '--audio-quality', '0', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === 'wav') {
+        args.push('-x', '--audio-format', 'wav', '--audio-quality', '0', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === '2160p') {
+        args.push('-f', 'bestvideo[height<=2160][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === '1440p') {
+        args.push('-f', 'bestvideo[height<=1440][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
     } else if (format === '1080p') {
         args.push('-f', 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
     } else if (format === '720p') {
         args.push('-f', 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
     } else if (format === '480p') {
         args.push('-f', 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === '360p') {
+        args.push('-f', 'bestvideo[height<=360][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === '240p') {
+        args.push('-f', 'bestvideo[height<=240][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
+    } else if (format === '144p') {
+        args.push('-f', 'bestvideo[height<=144][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
     } else {
         args.push('-f', 'best[ext=mp4]/best', '--merge-output-format', 'mp4', '-o', `${tempBase}-%(title)s.%(ext)s`, url);
     }

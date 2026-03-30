@@ -35,75 +35,88 @@ export default function FormatSelector({ videoUrl, availableQualities }) {
         Select Download Format
       </h3>
 
-      <div className="flex flex-col gap-3">
-        {/* MP3 Format */}
-        <button
-          onClick={() => handleDownload('mp3')}
-          disabled={isDownloading}
-          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
-            downloadingFormat === 'mp3' 
-              ? 'bg-primary/20 border-primary/50 text-white' 
-              : 'bg-surface/50 border-white/10 hover:bg-surface hover:border-white/20 text-textMain disabled:opacity-50 disabled:cursor-not-allowed'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/20 text-primary rounded-lg">
-              <Music size={20} />
-            </div>
-            <div className="text-left">
-              <div className="font-semibold">Audio Copy</div>
-              <div className="text-xs text-textMuted mt-0.5">MP3 format, 128kbps</div>
-            </div>
+      <div className="flex flex-col gap-5">
+        {/* Audio Formats */}
+        <div>
+          <h4 className="text-sm font-semibold text-textMuted mb-2 uppercase tracking-wide">Audio Options</h4>
+          <div className="grid grid-cols-3 gap-3">
+            {['mp3', 'm4a', 'wav'].map((audioFormat) => (
+              <button
+                key={audioFormat}
+                onClick={() => handleDownload(audioFormat)}
+                disabled={isDownloading}
+                className={`relative flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200 ${
+                  downloadingFormat === audioFormat 
+                    ? 'bg-primary/20 border-primary/50 text-white' 
+                    : 'bg-surface/50 border-white/10 hover:bg-surface hover:border-white/20 text-textMain disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {downloadingFormat === audioFormat ? (
+                  <Loader2 size={24} className="animate-spin text-primary mb-2" />
+                ) : (
+                  <div className="p-2 bg-primary/20 text-primary rounded-lg mb-2">
+                    <Music size={20} />
+                  </div>
+                )}
+                <div className="font-semibold uppercase text-sm">{audioFormat}</div>
+                <div className="text-[10px] text-textMuted mt-0.5">High Quality</div>
+                
+                {!isDownloading && downloadingFormat !== audioFormat && (
+                  <Download size={14} className="absolute top-2 right-2 text-textMuted opacity-0 group-hover:opacity-100" />
+                )}
+              </button>
+            ))}
           </div>
-          
-          {downloadingFormat === 'mp3' ? (
-            <Loader2 size={24} className="animate-spin text-primary" />
-          ) : (
-            <Download size={20} className="text-textMuted group-hover:text-white" />
-          )}
-        </button>
+        </div>
 
-        <div className="my-2 border-t border-white/10"></div>
+        <div className="border-t border-white/10"></div>
 
         {/* Video Formats */}
-        {['1080p', '720p', '480p'].map((format) => {
-          // Check if this format is in available qualities (simplified check)
-          const isHighest = format === '1080p';
-          
-          return (
-            <button
-              key={format}
-              onClick={() => handleDownload(format)}
-              disabled={isDownloading}
-              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
-                downloadingFormat === format 
-                  ? 'bg-primary/20 border-primary/50 text-white' 
-                  : 'bg-surface/50 border-white/10 hover:bg-surface hover:border-white/20 text-textMain disabled:opacity-50 disabled:cursor-not-allowed'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${isHighest ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                  <Video size={20} />
-                </div>
-                <div className="text-left">
-                  <div className="font-semibold flex items-center gap-2">
-                    {format} Resoluton
-                    {isHighest && (
-                      <span className="text-[10px] uppercase font-bold tracking-wider bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">HQ Audio + Video</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-textMuted mt-0.5">MP4 format (Includes Audio)</div>
-                </div>
-              </div>
+        <div>
+          <h4 className="text-sm font-semibold text-textMuted mb-2 uppercase tracking-wide">Video Options</h4>
+          <div className="grid grid-cols-2 gap-3">
+            {['2160p', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p']
+              .filter(format => !availableQualities || availableQualities.length === 0 || availableQualities.includes(format))
+              .map((format) => {
+              // Check if this format is in available qualities (simplified check)
+              const isHighest = format === '1080p' || format === '1440p' || format === '2160p';
               
-              {downloadingFormat === format ? (
-                <Loader2 size={24} className="animate-spin text-primary" />
-              ) : (
-                <Download size={20} className="text-textMuted" />
-              )}
-            </button>
-          );
-        })}
+              return (
+                <button
+                  key={format}
+                  onClick={() => handleDownload(format)}
+                  disabled={isDownloading}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${
+                    downloadingFormat === format 
+                      ? 'bg-primary/20 border-primary/50 text-white' 
+                      : 'bg-surface/50 border-white/10 hover:bg-surface hover:border-white/20 text-textMain disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`p-2 rounded-lg ${isHighest ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                      <Video size={16} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm flex items-center gap-1.5">
+                        {format}
+                        {isHighest && (
+                          <span className="text-[9px] uppercase font-bold tracking-wider bg-purple-500/20 text-purple-300 px-1 py-0.5 rounded">HQ</span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-textMuted mt-0.5">MP4 + Audio</div>
+                    </div>
+                  </div>
+                  
+                  {downloadingFormat === format ? (
+                    <Loader2 size={16} className="animate-spin text-primary" />
+                  ) : (
+                    <Download size={16} className="text-textMuted" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
