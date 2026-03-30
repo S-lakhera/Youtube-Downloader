@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Download, Music, Video, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://youtube-downloader-backend-ahds.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://writing-pillow-immunology-duncan.trycloudflare.com/api';
 
 export default function FormatSelector({ videoUrl, availableQualities }) {
   const [downloadingFormat, setDownloadingFormat] = useState(null);
@@ -9,21 +9,18 @@ export default function FormatSelector({ videoUrl, availableQualities }) {
   const handleDownload = (format) => {
     setDownloadingFormat(format);
     
-    // Construct the download URL
     const downloadUrl = `${API_BASE_URL}/download?url=${encodeURIComponent(videoUrl)}&format=${format}`;
     
-    // Trigger download via anchor element for native browser downloading (avoids RAM bloat)
     const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = '';
     document.body.appendChild(a);
     a.click();
     
-    // Clean up and reset loading state since browser handles the download stream
     setTimeout(() => {
       document.body.removeChild(a);
       setDownloadingFormat(null);
-    }, 2000); // 2 second mock delay for UI feedback
+    }, 2000); 
   };
 
   const isDownloading = downloadingFormat !== null;
